@@ -4,37 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paid Media Dashboard</title>
-  
-  <!-- PapaParse desde CDN para parsear CSV -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   
   <style>
-    /* ============================================
-       Reset y tipografía base
-       ============================================ */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #09090b; /* zinc-950 */
-      color: #e4e4e7; /* zinc-200 */
+      background: #09090b;
+      color: #e4e4e7;
       min-height: 100vh;
       padding: 2rem;
     }
     
-    /* ============================================
-       Layout
-       ============================================ */
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
+    .container { max-width: 1400px; margin: 0 auto; }
     
+    /* ==========================
+       HEADER
+       ========================== */
     header {
       margin-bottom: 2rem;
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
     
     h1 {
@@ -44,63 +38,218 @@
     }
     
     .subtitle {
-      color: #71717a; /* zinc-500 */
+      color: #71717a;
       font-size: 0.875rem;
       margin-top: 0.25rem;
     }
     
-    /* ============================================
-       Estado de carga / error
-       ============================================ */
+    .refresh-btn {
+      background: #27272a;
+      border: 1px solid #3f3f46;
+      color: #e4e4e7;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: background 0.15s;
+    }
+    
+    .refresh-btn:hover { background: #3f3f46; }
+    
+    /* ==========================
+       SCORECARDS GLOBALES
+       ========================== */
+    .scorecards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .scorecard {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+    }
+    
+    .scorecard-label {
+      color: #71717a;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    
+    .scorecard-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fafafa;
+      margin-bottom: 0.25rem;
+    }
+    
+    .scorecard-sub {
+      font-size: 0.875rem;
+      color: #a1a1aa;
+    }
+    
+    .scorecard-sub.positive { color: #4ade80; }
+    .scorecard-sub.warning { color: #facc15; }
+    .scorecard-sub.danger { color: #f87171; }
+    
+    /* ==========================
+       PACING BAR
+       ========================== */
+    .pacing-section {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .pacing-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+      font-size: 0.875rem;
+      color: #a1a1aa;
+    }
+    
+    .pacing-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #27272a;
+      border-radius: 9999px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .pacing-bar-fill {
+      height: 100%;
+      background: #4ade80;
+      transition: width 0.3s;
+    }
+    
+    .pacing-bar-fill.warning { background: #facc15; }
+    .pacing-bar-fill.danger { background: #f87171; }
+    
+    .pacing-expected-marker {
+      position: absolute;
+      top: -2px;
+      width: 2px;
+      height: 12px;
+      background: #fafafa;
+    }
+    
+    /* ==========================
+       TABLA DE CLIENTES
+       ========================== */
+    .clients-section {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+    
+    .clients-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #27272a;
+    }
+    
+    .clients-header h2 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #fafafa;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    thead {
+      background: #09090b;
+      border-bottom: 1px solid #27272a;
+    }
+    
+    th {
+      text-align: left;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #a1a1aa;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    th.right { text-align: right; }
+    th.center { text-align: center; }
+    
+    td {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #27272a;
+      font-size: 0.875rem;
+    }
+    
+    td.right { text-align: right; }
+    td.center { text-align: center; }
+    
+    tbody tr {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    
+    tbody tr:hover { background: #27272a; }
+    
+    .client-name {
+      color: #fafafa;
+      font-weight: 500;
+      text-transform: capitalize;
+    }
+    
+    .numeric { color: #d4d4d8; font-variant-numeric: tabular-nums; }
+    
+    .pct-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .status-dot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    
+    .status-green { background: #4ade80; }
+    .status-yellow { background: #facc15; }
+    .status-red { background: #f87171; }
+    .status-gray { background: #52525b; }
+    
+    /* ==========================
+       Estados de carga/error
+       ========================== */
     .loading, .error {
-      padding: 2rem;
+      padding: 3rem;
       text-align: center;
-      background: #18181b; /* zinc-900 */
+      background: #18181b;
       border-radius: 0.5rem;
       margin: 2rem 0;
     }
     
-    .error {
-      background: #450a0a;
-      color: #fca5a5;
-    }
+    .error { background: #450a0a; color: #fca5a5; }
     
-    /* ============================================
-       Sección de debug (temporal)
-       ============================================ */
-    .debug-section {
-      margin-bottom: 2rem;
-      background: #18181b;
-      border-radius: 0.5rem;
-      padding: 1.5rem;
-      border: 1px solid #27272a; /* zinc-800 */
-    }
-    
-    .debug-section h2 {
-      font-size: 1.125rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      color: #fafafa;
-    }
-    
-    .debug-section pre {
-      background: #09090b;
-      padding: 1rem;
-      border-radius: 0.375rem;
-      font-size: 0.75rem;
-      max-height: 300px;
-      overflow: auto;
-      color: #d4d4d8;
-    }
-    
-    .badge {
-      display: inline-block;
-      background: #27272a;
-      color: #a1a1aa;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      margin-left: 0.5rem;
+    /* ==========================
+       Responsive
+       ========================== */
+    @media (max-width: 768px) {
+      body { padding: 1rem; }
+      .scorecards { grid-template-columns: 1fr; }
+      th, td { padding: 0.5rem 0.75rem; font-size: 0.75rem; }
     }
   </style>
 </head>
@@ -111,6 +260,7 @@
         <h1>Paid Media Dashboard</h1>
         <p class="subtitle" id="last-updated">Cargando datos...</p>
       </div>
+      <button class="refresh-btn" onclick="location.reload()">↻ Refrescar</button>
     </header>
     
     <div id="app">
@@ -120,7 +270,7 @@
 
   <script>
     // ============================================
-    // CONFIGURACIÓN - URLs de los CSVs
+    // CONFIGURACIÓN
     // ============================================
     const CONFIG = {
       CSV_CLIENTES: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEH7G_E1uEjoivg5QjyW6iyN3PFFw6Q-w-HX3S7FrF7svXTkvYHX-TINb47bmiNTbdBUn7tl5icM8X/pub?gid=2070065787&single=true&output=csv',
@@ -129,21 +279,56 @@
     };
     
     // ============================================
-    // FETCHING Y PARSING DE CSV
+    // UTILS
+    // ============================================
+    function formatMoney(num) {
+      return '$' + num.toLocaleString('en-US', { 
+        minimumFractionDigits: 0, 
+        maximumFractionDigits: 0 
+      });
+    }
+    
+    function formatPct(num) {
+      return num.toFixed(1) + '%';
+    }
+    
+    function getCurrentMonth() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      return `${yyyy}-${mm}`;
+    }
+    
+    function getDiasDelMes(periodo) {
+      // periodo formato "YYYY-MM"
+      const [year, month] = periodo.split('-').map(Number);
+      const ultimoDia = new Date(year, month, 0).getDate();
+      const hoy = new Date();
+      const esElMesActual = (hoy.getFullYear() === year && (hoy.getMonth() + 1) === month);
+      
+      const diasTranscurridos = esElMesActual 
+        ? Math.max(hoy.getDate() - 1, 1)  // Hoy aún no cerró
+        : ultimoDia;
+      
+      return {
+        total: ultimoDia,
+        transcurridos: diasTranscurridos,
+        esElMesActual: esElMesActual
+      };
+    }
+    
+    // ============================================
+    // FETCHING DE DATOS
     // ============================================
     async function fetchCsv(url) {
       const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status} - ${url}`);
-      }
+      if (!response.ok) throw new Error(`HTTP ${response.status} - ${url}`);
       const text = await response.text();
-      
       const parsed = Papa.parse(text, {
         header: true,
         skipEmptyLines: true,
         dynamicTyping: true,
       });
-      
       return parsed.data;
     }
     
@@ -157,35 +342,187 @@
     }
     
     // ============================================
-    // RENDER - PLAYGROUND DE DATOS CRUDOS
+    // CÁLCULOS DE PACING
     // ============================================
-    function renderPlayground(data) {
-      const { clientes, presupuestos, historico } = data;
+    function calcularPacingCliente(idCliente, presupuestos, historico, periodo) {
+      // Presupuesto del cliente para el periodo
+      const filaPresup = presupuestos.find(p => 
+        p.id_cliente === idCliente && p.mes_periodo === periodo
+      );
+      const aprobado = filaPresup ? Number(filaPresup.presupuesto_total) || 0 : 0;
       
+      // Gasto del cliente en el periodo
+      const gastoFilas = historico.filter(h => 
+        h.id_cliente === idCliente && 
+        typeof h.fecha === 'string' && 
+        h.fecha.startsWith(periodo)
+      );
+      const ejecutado = gastoFilas.reduce((sum, h) => sum + (Number(h.gasto_dia) || 0), 0);
+      
+      // Días
+      const dias = getDiasDelMes(periodo);
+      const gastoDiarioPromedio = dias.transcurridos > 0 ? ejecutado / dias.transcurridos : 0;
+      const forecast = gastoDiarioPromedio * dias.total;
+      
+      // Porcentajes
+      const pctEjecucion = aprobado > 0 ? (ejecutado / aprobado) * 100 : 0;
+      const pctPacingEsperado = (dias.transcurridos / dias.total) * 100;
+      const desviacionProyectada = aprobado > 0 ? ((forecast - aprobado) / aprobado) * 100 : 0;
+      
+      // Semáforo basado en desviación proyectada
+      let status = 'gray';
+      if (aprobado > 0) {
+        const absDesv = Math.abs(desviacionProyectada);
+        if (absDesv <= 5) status = 'green';
+        else if (absDesv <= 15) status = 'yellow';
+        else status = 'red';
+      }
+      
+      return {
+        aprobado,
+        ejecutado,
+        forecast,
+        pctEjecucion,
+        pctPacingEsperado,
+        desviacionProyectada,
+        status,
+        dias,
+      };
+    }
+    
+    function calcularPacingGlobal(clientes, presupuestos, historico, periodo) {
+      const clientesActivos = clientes.filter(c => c.estado === 'activo');
+      
+      let aprobado = 0, ejecutado = 0, forecast = 0;
+      
+      clientesActivos.forEach(c => {
+        const pacing = calcularPacingCliente(c.id_cliente, presupuestos, historico, periodo);
+        aprobado += pacing.aprobado;
+        ejecutado += pacing.ejecutado;
+        forecast += pacing.forecast;
+      });
+      
+      const pctEjecucion = aprobado > 0 ? (ejecutado / aprobado) * 100 : 0;
+      const desviacionProyectada = aprobado > 0 ? ((forecast - aprobado) / aprobado) * 100 : 0;
+      const dias = getDiasDelMes(periodo);
+      const pctPacingEsperado = (dias.transcurridos / dias.total) * 100;
+      
+      let status = 'green';
+      const absDesv = Math.abs(desviacionProyectada);
+      if (absDesv > 15) status = 'red';
+      else if (absDesv > 5) status = 'yellow';
+      
+      return {
+        aprobado, ejecutado, forecast,
+        pctEjecucion, pctPacingEsperado, desviacionProyectada,
+        status, dias,
+      };
+    }
+    
+    // ============================================
+    // RENDER
+    // ============================================
+    function renderDashboard(data) {
+      const { clientes, presupuestos, historico } = data;
+      const periodo = getCurrentMonth();
+      
+      const global = calcularPacingGlobal(clientes, presupuestos, historico, periodo);
+      
+      const desvClass = global.status === 'green' ? 'positive' : 
+                       (global.status === 'yellow' ? 'warning' : 'danger');
+      const desvSign = global.desviacionProyectada >= 0 ? '+' : '';
+      
+      // Pacing bar
+      const pacingPct = Math.min(global.pctEjecucion, 100);
+      const expectedMarker = Math.min(global.pctPacingEsperado, 100);
+      const pacingBarClass = global.status === 'green' ? '' : 
+                            (global.status === 'yellow' ? 'warning' : 'danger');
+      
+      // Tabla de clientes
+      const clientesActivos = clientes.filter(c => c.estado === 'activo');
+      
+      const filasClientes = clientesActivos
+        .map(c => {
+          const p = calcularPacingCliente(c.id_cliente, presupuestos, historico, periodo);
+          return { cliente: c, pacing: p };
+        })
+        .sort((a, b) => b.pacing.aprobado - a.pacing.aprobado) // ordenar por presupuesto desc
+        .map(({ cliente, pacing }) => {
+          const desvSign = pacing.desviacionProyectada >= 0 ? '+' : '';
+          const desvClass = pacing.status === 'green' ? 'positive' : 
+                           (pacing.status === 'yellow' ? 'warning' : 'danger');
+          
+          return `
+            <tr onclick="alert('Vista de detalle viene en el siguiente paso. Cliente: ${cliente.nombre_cliente}')">
+              <td class="client-name">${cliente.nombre_cliente || cliente.id_cliente}</td>
+              <td class="right numeric">${formatMoney(pacing.aprobado)}</td>
+              <td class="right numeric">${formatMoney(pacing.ejecutado)}</td>
+              <td class="right numeric">${formatPct(pacing.pctEjecucion)}</td>
+              <td class="right numeric">${formatMoney(pacing.forecast)}</td>
+              <td class="right numeric scorecard-sub ${desvClass}">${desvSign}${formatPct(pacing.desviacionProyectada)}</td>
+              <td class="center"><span class="status-dot status-${pacing.status}"></span></td>
+            </tr>
+          `;
+        }).join('');
+      
+      // Render final
       const app = document.getElementById('app');
       app.innerHTML = `
-        <div class="debug-section">
-          <h2>Clientes <span class="badge">${clientes.length} filas</span></h2>
-          <pre>${JSON.stringify(clientes, null, 2)}</pre>
+        <div class="scorecards">
+          <div class="scorecard">
+            <div class="scorecard-label">Aprobado</div>
+            <div class="scorecard-value">${formatMoney(global.aprobado)}</div>
+            <div class="scorecard-sub">${clientesActivos.length} clientes activos</div>
+          </div>
+          <div class="scorecard">
+            <div class="scorecard-label">Ejecutado</div>
+            <div class="scorecard-value">${formatMoney(global.ejecutado)}</div>
+            <div class="scorecard-sub">${formatPct(global.pctEjecucion)} del aprobado</div>
+          </div>
+          <div class="scorecard">
+            <div class="scorecard-label">Forecast Mes</div>
+            <div class="scorecard-value">${formatMoney(global.forecast)}</div>
+            <div class="scorecard-sub ${desvClass}">${desvSign}${formatPct(global.desviacionProyectada)} vs aprobado</div>
+          </div>
         </div>
         
-        <div class="debug-section">
-          <h2>Presupuestos del mes <span class="badge">${presupuestos.length} filas</span></h2>
-          <pre>${JSON.stringify(presupuestos, null, 2)}</pre>
+        <div class="pacing-section">
+          <div class="pacing-info">
+            <span>Día ${global.dias.transcurridos} de ${global.dias.total}</span>
+            <span>Pacing esperado: ${formatPct(global.pctPacingEsperado)}</span>
+          </div>
+          <div class="pacing-bar-container">
+            <div class="pacing-bar-fill ${pacingBarClass}" style="width: ${pacingPct}%"></div>
+            <div class="pacing-expected-marker" style="left: ${expectedMarker}%"></div>
+          </div>
         </div>
         
-        <div class="debug-section">
-          <h2>Historico de Gasto <span class="badge">${historico.length} filas</span></h2>
-          <pre>${JSON.stringify(historico.slice(0, 20), null, 2)}</pre>
-          <p style="color: #71717a; font-size: 0.75rem; margin-top: 0.5rem;">
-            Mostrando los primeros 20 de ${historico.length} registros.
-          </p>
+        <div class="clients-section">
+          <div class="clients-header">
+            <h2>Clientes</h2>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th class="right">Aprobado</th>
+                <th class="right">Ejecutado</th>
+                <th class="right">% Ejec</th>
+                <th class="right">Forecast</th>
+                <th class="right">Desv. Proy.</th>
+                <th class="center">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filasClientes}
+            </tbody>
+          </table>
         </div>
       `;
       
-      // Actualizar el subtitle con la hora de carga
+      // Actualizar timestamp
       const now = new Date().toLocaleString('es-ES');
-      document.getElementById('last-updated').textContent = `Última actualización: ${now}`;
+      document.getElementById('last-updated').textContent = `Última actualización: ${now} — Periodo: ${periodo}`;
     }
     
     // ============================================
@@ -194,15 +531,12 @@
     async function init() {
       try {
         const data = await loadAllData();
-        renderPlayground(data);
+        renderDashboard(data);
       } catch (error) {
         document.getElementById('app').innerHTML = `
           <div class="error">
             <h2 style="margin-bottom: 1rem;">Error cargando datos</h2>
             <p>${error.message}</p>
-            <p style="margin-top: 1rem; font-size: 0.875rem;">
-              Revisá que las URLs en CONFIG estén bien configuradas y que los CSVs sean accesibles públicamente.
-            </p>
           </div>
         `;
         console.error(error);
