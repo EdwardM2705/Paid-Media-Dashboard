@@ -19,9 +19,7 @@
     
     .container { max-width: 1400px; margin: 0 auto; }
     
-    /* ==========================
-       HEADER
-       ========================== */
+    /* HEADER */
     header {
       margin-bottom: 2rem;
       display: flex;
@@ -31,16 +29,24 @@
       gap: 1rem;
     }
     
-    h1 {
-      font-size: 1.875rem;
-      font-weight: 700;
-      color: #fafafa;
+    h1 { font-size: 1.875rem; font-weight: 700; color: #fafafa; }
+    .subtitle { color: #71717a; font-size: 0.875rem; margin-top: 0.25rem; }
+    
+    .header-controls {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
     }
     
-    .subtitle {
-      color: #71717a;
+    .month-selector {
+      background: #18181b;
+      border: 1px solid #27272a;
+      color: #fafafa;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      cursor: pointer;
       font-size: 0.875rem;
-      margin-top: 0.25rem;
+      min-width: 160px;
     }
     
     .refresh-btn {
@@ -56,9 +62,18 @@
     
     .refresh-btn:hover { background: #3f3f46; }
     
-    /* ==========================
-       SCORECARDS GLOBALES
-       ========================== */
+    .month-indicator {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      margin-left: 0.5rem;
+    }
+    
+    .month-indicator.current { background: #166534; color: #bbf7d0; }
+    .month-indicator.past { background: #27272a; color: #a1a1aa; }
+    
+    /* SCORECARDS */
     .scorecards {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -97,9 +112,7 @@
     .scorecard-sub.warning { color: #facc15; }
     .scorecard-sub.danger { color: #f87171; }
     
-    /* ==========================
-       PACING BAR
-       ========================== */
+    /* PACING BAR */
     .pacing-section {
       background: #18181b;
       border: 1px solid #27272a;
@@ -142,9 +155,7 @@
       background: #fafafa;
     }
     
-    /* ==========================
-       TABLA DE CLIENTES
-       ========================== */
+    /* TABLA CLIENTES */
     .clients-section {
       background: #18181b;
       border: 1px solid #27272a;
@@ -157,16 +168,9 @@
       border-bottom: 1px solid #27272a;
     }
     
-    .clients-header h2 {
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: #fafafa;
-    }
+    .clients-header h2 { font-size: 1.125rem; font-weight: 600; color: #fafafa; }
     
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+    table { width: 100%; border-collapse: collapse; }
     
     thead {
       background: #09090b;
@@ -210,14 +214,6 @@
     
     .numeric { color: #d4d4d8; font-variant-numeric: tabular-nums; }
     
-    .pct-badge {
-      display: inline-block;
-      padding: 0.125rem 0.5rem;
-      border-radius: 0.25rem;
-      font-size: 0.75rem;
-      font-weight: 500;
-    }
-    
     .status-dot {
       display: inline-block;
       width: 12px;
@@ -230,9 +226,6 @@
     .status-red { background: #f87171; }
     .status-gray { background: #52525b; }
     
-    /* ==========================
-       Estados de carga/error
-       ========================== */
     .loading, .error {
       padding: 3rem;
       text-align: center;
@@ -243,9 +236,6 @@
     
     .error { background: #450a0a; color: #fca5a5; }
     
-    /* ==========================
-       Responsive
-       ========================== */
     @media (max-width: 768px) {
       body { padding: 1rem; }
       .scorecards { grid-template-columns: 1fr; }
@@ -260,7 +250,12 @@
         <h1>Paid Media Dashboard</h1>
         <p class="subtitle" id="last-updated">Cargando datos...</p>
       </div>
-      <button class="refresh-btn" onclick="location.reload()">↻ Refrescar</button>
+      <div class="header-controls">
+        <select id="month-selector" class="month-selector" onchange="onMonthChange()">
+          <option>Cargando...</option>
+        </select>
+        <button class="refresh-btn" onclick="location.reload()">↻ Refrescar</button>
+      </div>
     </header>
     
     <div id="app">
@@ -269,27 +264,29 @@
   </div>
 
   <script>
-    // ============================================
-    // CONFIGURACIÓN
-    // ============================================
     const CONFIG = {
+   
       CSV_CLIENTES: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEH7G_E1uEjoivg5QjyW6iyN3PFFw6Q-w-HX3S7FrF7svXTkvYHX-TINb47bmiNTbdBUn7tl5icM8X/pub?gid=2070065787&single=true&output=csv',
       CSV_PRESUPUESTOS: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEH7G_E1uEjoivg5QjyW6iyN3PFFw6Q-w-HX3S7FrF7svXTkvYHX-TINb47bmiNTbdBUn7tl5icM8X/pub?gid=0&single=true&output=csv',
-      CSV_HISTORICO: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEH7G_E1uEjoivg5QjyW6iyN3PFFw6Q-w-HX3S7FrF7svXTkvYHX-TINb47bmiNTbdBUn7tl5icM8X/pub?gid=249745944&single=true&output=csv ',
+      CSV_HISTORICO: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEH7G_E1uEjoivg5QjyW6iyN3PFFw6Q-w-HX3S7FrF7svXTkvYHX-TINb47bmiNTbdBUn7tl5icM8X/pub?gid=249745944&single=true&output=csv',
     };
+    
+    // Estado global
+    let GLOBAL_DATA = null;
+    let SELECTED_PERIOD = null;
     
     // ============================================
     // UTILS
     // ============================================
     function formatMoney(num) {
-      return '$' + num.toLocaleString('en-US', { 
+      return '$' + (num || 0).toLocaleString('en-US', { 
         minimumFractionDigits: 0, 
         maximumFractionDigits: 0 
       });
     }
     
     function formatPct(num) {
-      return num.toFixed(1) + '%';
+      return (num || 0).toFixed(1) + '%';
     }
     
     function getCurrentMonth() {
@@ -299,26 +296,58 @@
       return `${yyyy}-${mm}`;
     }
     
+    function formatMonthLabel(periodo) {
+      // "2026-05" → "Mayo 2026"
+      const [year, month] = periodo.split('-').map(Number);
+      const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+      return `${meses[month - 1]} ${year}`;
+    }
+    
     function getDiasDelMes(periodo) {
-      // periodo formato "YYYY-MM"
       const [year, month] = periodo.split('-').map(Number);
       const ultimoDia = new Date(year, month, 0).getDate();
       const hoy = new Date();
       const esElMesActual = (hoy.getFullYear() === year && (hoy.getMonth() + 1) === month);
+      const esMesPasado = (hoy.getFullYear() > year) || 
+                          (hoy.getFullYear() === year && (hoy.getMonth() + 1) > month);
       
-      const diasTranscurridos = esElMesActual 
-        ? Math.max(hoy.getDate() - 1, 1)  // Hoy aún no cerró
-        : ultimoDia;
+      let diasTranscurridos;
+      if (esMesPasado) {
+        diasTranscurridos = ultimoDia; // mes cerrado, todos los días contaron
+      } else if (esElMesActual) {
+        diasTranscurridos = Math.max(hoy.getDate() - 1, 1); // hoy aún no cerró
+      } else {
+        diasTranscurridos = 0; // mes futuro
+      }
       
       return {
         total: ultimoDia,
         transcurridos: diasTranscurridos,
-        esElMesActual: esElMesActual
+        esElMesActual,
+        esMesPasado,
       };
     }
     
+    // Detecta todos los periodos disponibles en los datos
+    function getAvailablePeriods(presupuestos, historico) {
+      const periods = new Set();
+      
+      presupuestos.forEach(p => {
+        if (p.mes_periodo) periods.add(p.mes_periodo);
+      });
+      
+      historico.forEach(h => {
+        if (typeof h.fecha === 'string' && h.fecha.length >= 7) {
+          periods.add(h.fecha.substring(0, 7));
+        }
+      });
+      
+      return Array.from(periods).sort().reverse(); // más reciente primero
+    }
+    
     // ============================================
-    // FETCHING DE DATOS
+    // FETCHING
     // ============================================
     async function fetchCsv(url) {
       const response = await fetch(url);
@@ -342,16 +371,14 @@
     }
     
     // ============================================
-    // CÁLCULOS DE PACING
+    // CÁLCULOS
     // ============================================
     function calcularPacingCliente(idCliente, presupuestos, historico, periodo) {
-      // Presupuesto del cliente para el periodo
       const filaPresup = presupuestos.find(p => 
         p.id_cliente === idCliente && p.mes_periodo === periodo
       );
       const aprobado = filaPresup ? Number(filaPresup.presupuesto_total) || 0 : 0;
       
-      // Gasto del cliente en el periodo
       const gastoFilas = historico.filter(h => 
         h.id_cliente === idCliente && 
         typeof h.fecha === 'string' && 
@@ -359,17 +386,14 @@
       );
       const ejecutado = gastoFilas.reduce((sum, h) => sum + (Number(h.gasto_dia) || 0), 0);
       
-      // Días
       const dias = getDiasDelMes(periodo);
       const gastoDiarioPromedio = dias.transcurridos > 0 ? ejecutado / dias.transcurridos : 0;
-      const forecast = gastoDiarioPromedio * dias.total;
+      const forecast = dias.esMesPasado ? ejecutado : gastoDiarioPromedio * dias.total;
       
-      // Porcentajes
       const pctEjecucion = aprobado > 0 ? (ejecutado / aprobado) * 100 : 0;
       const pctPacingEsperado = (dias.transcurridos / dias.total) * 100;
       const desviacionProyectada = aprobado > 0 ? ((forecast - aprobado) / aprobado) * 100 : 0;
       
-      // Semáforo basado en desviación proyectada
       let status = 'gray';
       if (aprobado > 0) {
         const absDesv = Math.abs(desviacionProyectada);
@@ -379,14 +403,9 @@
       }
       
       return {
-        aprobado,
-        ejecutado,
-        forecast,
-        pctEjecucion,
-        pctPacingEsperado,
-        desviacionProyectada,
-        status,
-        dias,
+        aprobado, ejecutado, forecast,
+        pctEjecucion, pctPacingEsperado, desviacionProyectada,
+        status, dias,
       };
     }
     
@@ -396,10 +415,10 @@
       let aprobado = 0, ejecutado = 0, forecast = 0;
       
       clientesActivos.forEach(c => {
-        const pacing = calcularPacingCliente(c.id_cliente, presupuestos, historico, periodo);
-        aprobado += pacing.aprobado;
-        ejecutado += pacing.ejecutado;
-        forecast += pacing.forecast;
+        const p = calcularPacingCliente(c.id_cliente, presupuestos, historico, periodo);
+        aprobado += p.aprobado;
+        ejecutado += p.ejecutado;
+        forecast += p.forecast;
       });
       
       const pctEjecucion = aprobado > 0 ? (ejecutado / aprobado) * 100 : 0;
@@ -422,9 +441,21 @@
     // ============================================
     // RENDER
     // ============================================
-    function renderDashboard(data) {
-      const { clientes, presupuestos, historico } = data;
-      const periodo = getCurrentMonth();
+    function renderMonthSelector(availablePeriods, selectedPeriod) {
+      const selector = document.getElementById('month-selector');
+      const currentMonth = getCurrentMonth();
+      
+      selector.innerHTML = availablePeriods.map(p => {
+        const label = formatMonthLabel(p);
+        const tag = p === currentMonth ? ' (actual)' : '';
+        const selected = p === selectedPeriod ? ' selected' : '';
+        return `<option value="${p}"${selected}>${label}${tag}</option>`;
+      }).join('');
+    }
+    
+    function renderDashboard() {
+      const { clientes, presupuestos, historico } = GLOBAL_DATA;
+      const periodo = SELECTED_PERIOD;
       
       const global = calcularPacingGlobal(clientes, presupuestos, historico, periodo);
       
@@ -432,45 +463,53 @@
                        (global.status === 'yellow' ? 'warning' : 'danger');
       const desvSign = global.desviacionProyectada >= 0 ? '+' : '';
       
-      // Pacing bar
       const pacingPct = Math.min(global.pctEjecucion, 100);
       const expectedMarker = Math.min(global.pctPacingEsperado, 100);
       const pacingBarClass = global.status === 'green' ? '' : 
                             (global.status === 'yellow' ? 'warning' : 'danger');
       
-      // Tabla de clientes
       const clientesActivos = clientes.filter(c => c.estado === 'activo');
       
       const filasClientes = clientesActivos
-        .map(c => {
-          const p = calcularPacingCliente(c.id_cliente, presupuestos, historico, periodo);
-          return { cliente: c, pacing: p };
-        })
-        .sort((a, b) => b.pacing.aprobado - a.pacing.aprobado) // ordenar por presupuesto desc
+        .map(c => ({
+          cliente: c,
+          pacing: calcularPacingCliente(c.id_cliente, presupuestos, historico, periodo)
+        }))
+        .sort((a, b) => b.pacing.aprobado - a.pacing.aprobado)
         .map(({ cliente, pacing }) => {
-          const desvSign = pacing.desviacionProyectada >= 0 ? '+' : '';
-          const desvClass = pacing.status === 'green' ? 'positive' : 
-                           (pacing.status === 'yellow' ? 'warning' : 'danger');
+          const dSign = pacing.desviacionProyectada >= 0 ? '+' : '';
+          const dClass = pacing.status === 'green' ? 'positive' : 
+                        (pacing.status === 'yellow' ? 'warning' : 'danger');
           
           return `
-            <tr onclick="alert('Vista de detalle viene en el siguiente paso. Cliente: ${cliente.nombre_cliente}')">
+            <tr onclick="alert('Vista de detalle próximamente. Cliente: ${cliente.nombre_cliente}')">
               <td class="client-name">${cliente.nombre_cliente || cliente.id_cliente}</td>
               <td class="right numeric">${formatMoney(pacing.aprobado)}</td>
               <td class="right numeric">${formatMoney(pacing.ejecutado)}</td>
               <td class="right numeric">${formatPct(pacing.pctEjecucion)}</td>
               <td class="right numeric">${formatMoney(pacing.forecast)}</td>
-              <td class="right numeric scorecard-sub ${desvClass}">${desvSign}${formatPct(pacing.desviacionProyectada)}</td>
+              <td class="right numeric scorecard-sub ${dClass}">${dSign}${formatPct(pacing.desviacionProyectada)}</td>
               <td class="center"><span class="status-dot status-${pacing.status}"></span></td>
             </tr>
           `;
         }).join('');
       
-      // Render final
+      // Indicador de mes
+      const monthIndicator = global.dias.esElMesActual 
+        ? '<span class="month-indicator current">En curso</span>'
+        : (global.dias.esMesPasado ? '<span class="month-indicator past">Mes cerrado</span>' : '');
+      
+      const pacingLabel = global.dias.esMesPasado 
+        ? `${global.dias.total} de ${global.dias.total} días (cerrado)`
+        : `Día ${global.dias.transcurridos} de ${global.dias.total}`;
+      
+      const forecastLabel = global.dias.esMesPasado ? 'Total Final' : 'Forecast Mes';
+      
       const app = document.getElementById('app');
       app.innerHTML = `
         <div class="scorecards">
           <div class="scorecard">
-            <div class="scorecard-label">Aprobado</div>
+            <div class="scorecard-label">Aprobado ${monthIndicator}</div>
             <div class="scorecard-value">${formatMoney(global.aprobado)}</div>
             <div class="scorecard-sub">${clientesActivos.length} clientes activos</div>
           </div>
@@ -480,7 +519,7 @@
             <div class="scorecard-sub">${formatPct(global.pctEjecucion)} del aprobado</div>
           </div>
           <div class="scorecard">
-            <div class="scorecard-label">Forecast Mes</div>
+            <div class="scorecard-label">${forecastLabel}</div>
             <div class="scorecard-value">${formatMoney(global.forecast)}</div>
             <div class="scorecard-sub ${desvClass}">${desvSign}${formatPct(global.desviacionProyectada)} vs aprobado</div>
           </div>
@@ -488,7 +527,7 @@
         
         <div class="pacing-section">
           <div class="pacing-info">
-            <span>Día ${global.dias.transcurridos} de ${global.dias.total}</span>
+            <span>${pacingLabel}</span>
             <span>Pacing esperado: ${formatPct(global.pctPacingEsperado)}</span>
           </div>
           <div class="pacing-bar-container">
@@ -499,7 +538,7 @@
         
         <div class="clients-section">
           <div class="clients-header">
-            <h2>Clientes</h2>
+            <h2>Clientes — ${formatMonthLabel(periodo)}</h2>
           </div>
           <table>
             <thead>
@@ -508,7 +547,7 @@
                 <th class="right">Aprobado</th>
                 <th class="right">Ejecutado</th>
                 <th class="right">% Ejec</th>
-                <th class="right">Forecast</th>
+                <th class="right">${forecastLabel}</th>
                 <th class="right">Desv. Proy.</th>
                 <th class="center">Status</th>
               </tr>
@@ -520,18 +559,45 @@
         </div>
       `;
       
-      // Actualizar timestamp
       const now = new Date().toLocaleString('es-ES');
-      document.getElementById('last-updated').textContent = `Última actualización: ${now} — Periodo: ${periodo}`;
+      document.getElementById('last-updated').textContent = 
+        `Última actualización: ${now} — Visualizando: ${formatMonthLabel(periodo)}`;
+    }
+    
+    function onMonthChange() {
+      const selector = document.getElementById('month-selector');
+      SELECTED_PERIOD = selector.value;
+      renderDashboard();
     }
     
     // ============================================
-    // INICIALIZACIÓN
+    // INIT
     // ============================================
     async function init() {
       try {
-        const data = await loadAllData();
-        renderDashboard(data);
+        GLOBAL_DATA = await loadAllData();
+        
+        // Detectar periodos disponibles
+        const availablePeriods = getAvailablePeriods(
+          GLOBAL_DATA.presupuestos, 
+          GLOBAL_DATA.historico
+        );
+        
+        if (availablePeriods.length === 0) {
+          document.getElementById('app').innerHTML = `
+            <div class="error">
+              <h2>Sin datos disponibles</h2>
+              <p>No se encontraron presupuestos ni gastos para ningún periodo.</p>
+            </div>
+          `;
+          return;
+        }
+        
+        // Por default, seleccionar el periodo más reciente con data
+        SELECTED_PERIOD = availablePeriods[0];
+        
+        renderMonthSelector(availablePeriods, SELECTED_PERIOD);
+        renderDashboard();
       } catch (error) {
         document.getElementById('app').innerHTML = `
           <div class="error">
