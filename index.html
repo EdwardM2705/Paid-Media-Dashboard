@@ -9,12 +9,35 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
+    :root {
+      --bg: #09090b;
+      --card: #18181b;
+      --card-hover: #1c1c20;
+      --border: #27272a;
+      --border-hover: #3f3f46;
+      --text: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --green: #4ade80;
+      --green-dark: #22c55e;
+      --green-bg: rgba(74, 222, 128, 0.1);
+      --yellow: #facc15;
+      --yellow-dark: #eab308;
+      --yellow-bg: rgba(250, 204, 21, 0.1);
+      --red: #f87171;
+      --red-dark: #ef4444;
+      --red-bg: rgba(248, 113, 113, 0.1);
+      --blue: #60a5fa;
+      --purple: #a78bfa;
+    }
+    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #09090b;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
       color: #e4e4e7;
       min-height: 100vh;
       padding: 2rem;
+      line-height: 1.5;
     }
     
     .container { max-width: 1400px; margin: 0 auto; }
@@ -29,171 +52,423 @@
       gap: 1rem;
     }
     
-    h1 { font-size: 1.875rem; font-weight: 700; color: #fafafa; }
-    .subtitle { color: #71717a; font-size: 0.875rem; margin-top: 0.25rem; }
+    .header-title { display: flex; align-items: center; gap: 0.75rem; }
+    
+    .header-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+    
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.025em;
+    }
+    
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+      margin-top: 0.125rem;
+    }
     
     .header-controls {
       display: flex;
-      gap: 0.75rem;
+      gap: 0.5rem;
       align-items: center;
     }
     
-    .month-selector {
-      background: #18181b;
-      border: 1px solid #27272a;
-      color: #fafafa;
-      padding: 0.5rem 1rem;
-      border-radius: 0.375rem;
+    .month-selector, .refresh-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 0.875rem;
+      border-radius: 0.5rem;
       cursor: pointer;
-      font-size: 0.875rem;
-      min-width: 160px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      transition: all 0.15s;
     }
     
-    .refresh-btn {
-      background: #27272a;
-      border: 1px solid #3f3f46;
-      color: #e4e4e7;
-      padding: 0.5rem 1rem;
-      border-radius: 0.375rem;
-      cursor: pointer;
-      font-size: 0.875rem;
-      transition: background 0.15s;
+    .month-selector { min-width: 170px; }
+    .month-selector:hover, .refresh-btn:hover {
+      border-color: var(--border-hover);
+      background: var(--card-hover);
     }
-    
-    .refresh-btn:hover { background: #3f3f46; }
-    
-    .month-indicator {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      margin-left: 0.5rem;
-    }
-    
-    .month-indicator.current { background: #166534; color: #bbf7d0; }
-    .month-indicator.past { background: #27272a; color: #a1a1aa; }
     
     /* SCORECARDS */
     .scorecards {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
     }
     
     .scorecard {
-      background: #18181b;
-      border: 1px solid #27272a;
-      border-radius: 0.5rem;
-      padding: 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      transition: border-color 0.15s;
+    }
+    
+    .scorecard:hover { border-color: var(--border-hover); }
+    
+    .scorecard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
     }
     
     .scorecard-label {
-      color: #71717a;
-      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-size: 0.6875rem;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.5rem;
+      letter-spacing: 0.075em;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
     
+    .scorecard-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    
+    .scorecard-icon.approved { background: rgba(96, 165, 250, 0.15); color: var(--blue); }
+    .scorecard-icon.executed { background: var(--green-bg); color: var(--green); }
+    .scorecard-icon.forecast { background: rgba(167, 139, 250, 0.15); color: var(--purple); }
+    
     .scorecard-value {
-      font-size: 2rem;
+      font-size: 1.875rem;
       font-weight: 700;
-      color: #fafafa;
-      margin-bottom: 0.25rem;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 0.5rem;
+      line-height: 1.1;
     }
     
     .scorecard-sub {
-      font-size: 0.875rem;
-      color: #a1a1aa;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
     }
     
-    .scorecard-sub.positive { color: #4ade80; }
-    .scorecard-sub.warning { color: #facc15; }
-    .scorecard-sub.danger { color: #f87171; }
+    .scorecard-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .scorecard-badge.positive { background: var(--green-bg); color: var(--green); }
+    .scorecard-badge.warning { background: var(--yellow-bg); color: var(--yellow); }
+    .scorecard-badge.danger { background: var(--red-bg); color: var(--red); }
+    .scorecard-badge.neutral { background: var(--border); color: var(--text-secondary); }
     
     /* PACING BAR */
     .pacing-section {
-      background: #18181b;
-      border: 1px solid #27272a;
-      border-radius: 0.5rem;
-      padding: 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .pacing-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.25rem;
+    }
+    
+    .pacing-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .pacing-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.625rem;
+      border-radius: 9999px;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .pacing-status-badge::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    
+    .pacing-status-badge.status-green { background: var(--green-bg); color: var(--green); }
+    .pacing-status-badge.status-yellow { background: var(--yellow-bg); color: var(--yellow); }
+    .pacing-status-badge.status-red { background: var(--red-bg); color: var(--red); }
+    .pacing-status-badge.status-gray { background: var(--border); color: var(--text-muted); }
+    
+    .pacing-info {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    
+    .pacing-bar-wrapper {
+      position: relative;
       margin-bottom: 2rem;
     }
     
-    .pacing-info {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.75rem;
-      font-size: 0.875rem;
-      color: #a1a1aa;
-    }
-    
-    .pacing-bar-container {
+    .pacing-bar-track {
       width: 100%;
-      height: 8px;
-      background: #27272a;
+      height: 14px;
+      background: var(--border);
       border-radius: 9999px;
       overflow: hidden;
-      position: relative;
     }
     
     .pacing-bar-fill {
       height: 100%;
-      background: #4ade80;
-      transition: width 0.3s;
+      border-radius: 9999px;
+      transition: width 0.5s ease-out;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 6px;
+      min-width: 40px;
     }
     
-    .pacing-bar-fill.warning { background: #facc15; }
-    .pacing-bar-fill.danger { background: #f87171; }
+    .pacing-bar-fill.green {
+      background: linear-gradient(90deg, var(--green), var(--green-dark));
+    }
     
-    .pacing-expected-marker {
+    .pacing-bar-fill.yellow {
+      background: linear-gradient(90deg, var(--yellow), var(--yellow-dark));
+    }
+    
+    .pacing-bar-fill.red {
+      background: linear-gradient(90deg, var(--red), var(--red-dark));
+    }
+    
+    .pacing-bar-pct {
+      font-size: 0.625rem;
+      font-weight: 700;
+      color: rgba(0, 0, 0, 0.75);
+    }
+    
+    .pacing-marker {
       position: absolute;
       top: -2px;
       width: 2px;
-      height: 12px;
-      background: #fafafa;
+      height: 18px;
+      background: var(--text);
+      border-radius: 2px;
+      transform: translateX(-50%);
     }
     
-    /* TABLA CLIENTES */
-    .clients-section {
-      background: #18181b;
-      border: 1px solid #27272a;
+    .pacing-marker-label {
+      position: absolute;
+      top: 22px;
+      transform: translateX(-50%);
+      font-size: 0.6875rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      white-space: nowrap;
+    }
+    
+    .pacing-marker-dash {
+      width: 8px;
+      height: 2px;
+      background: var(--text);
+    }
+    
+    .pacing-metrics {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 0.875rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .pacing-metric-label {
+      font-size: 0.625rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.125rem;
+    }
+    
+    .pacing-metric-value {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+    
+    /* FILTROS */
+    .filters-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      max-width: 260px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 0.875rem;
       border-radius: 0.5rem;
+      font-size: 0.8125rem;
+      transition: border-color 0.15s;
+    }
+    
+    .search-input::placeholder { color: var(--text-muted); }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--blue);
+    }
+    
+    .filter-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 0.5rem 0.875rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+    
+    .filter-btn:hover {
+      border-color: var(--border-hover);
+      color: var(--text);
+    }
+    
+    .filter-btn.active {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+    
+    .filter-btn .count {
+      background: var(--border);
+      color: var(--text-muted);
+      padding: 0.0625rem 0.375rem;
+      border-radius: 9999px;
+      font-size: 0.6875rem;
+      font-weight: 600;
+    }
+    
+    .filter-btn.active .count {
+      background: rgba(0,0,0,0.15);
+      color: rgba(0,0,0,0.7);
+    }
+    
+    /* TABLA */
+    .clients-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
       overflow: hidden;
     }
     
     .clients-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid #27272a;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     
-    .clients-header h2 { font-size: 1.125rem; font-weight: 600; color: #fafafa; }
+    .clients-header h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
     
-    table { width: 100%; border-collapse: collapse; }
+    .clients-count {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
     
     thead {
-      background: #09090b;
-      border-bottom: 1px solid #27272a;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
     }
     
     th {
       text-align: left;
-      padding: 0.75rem 1.5rem;
-      font-size: 0.75rem;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.6875rem;
       font-weight: 600;
-      color: #a1a1aa;
+      color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.075em;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.15s;
     }
     
+    th:hover { color: var(--text); }
     th.right { text-align: right; }
     th.center { text-align: center; }
     
+    th .sort-icon {
+      opacity: 0.4;
+      margin-left: 0.25rem;
+      font-size: 0.75rem;
+    }
+    
+    th.sorted .sort-icon { opacity: 1; color: var(--blue); }
+    
     td {
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid #27272a;
+      padding: 0.875rem 1.25rem;
+      border-bottom: 1px solid var(--border);
       font-size: 0.875rem;
+      vertical-align: middle;
     }
     
     td.right { text-align: right; }
@@ -204,51 +479,209 @@
       transition: background 0.15s;
     }
     
-    tbody tr:hover { background: #27272a; }
+    tbody tr:hover { background: var(--card-hover); }
+    tbody tr:last-child td { border-bottom: none; }
+    
+    .client-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+    }
+    
+    .client-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 0.375rem;
+      background: linear-gradient(135deg, #3f3f46, #52525b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+    
+    .client-info { display: flex; flex-direction: column; gap: 0.125rem; }
     
     .client-name {
-      color: #fafafa;
+      color: var(--text);
       font-weight: 500;
       text-transform: capitalize;
+      line-height: 1.2;
     }
     
-    .numeric { color: #d4d4d8; font-variant-numeric: tabular-nums; }
+    .client-platforms {
+      display: flex;
+      gap: 0.25rem;
+      font-size: 0.625rem;
+      color: var(--text-muted);
+    }
     
-    .status-dot {
+    .platform-tag {
+      background: var(--border);
+      padding: 0.0625rem 0.375rem;
+      border-radius: 0.25rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .numeric {
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      font-weight: 500;
+    }
+    
+    .pct-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.25rem;
+    }
+    
+    .pct-value {
+      font-size: 0.8125rem;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+    
+    .pct-mini-bar {
+      width: 70px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    
+    .pct-mini-bar-fill {
+      height: 100%;
+      background: var(--green);
+      transition: width 0.3s;
+    }
+    
+    .pct-mini-bar-fill.warning { background: var(--yellow); }
+    .pct-mini-bar-fill.danger { background: var(--red); }
+    
+    .desv-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.1875rem 0.5rem;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    
+    .desv-badge.positive { background: var(--green-bg); color: var(--green); }
+    .desv-badge.warning { background: var(--yellow-bg); color: var(--yellow); }
+    .desv-badge.danger { background: var(--red-bg); color: var(--red); }
+    .desv-badge.neutral { background: var(--border); color: var(--text-muted); }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.625rem;
+      border-radius: 9999px;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .status-badge.status-green { background: var(--green-bg); color: var(--green); }
+    .status-badge.status-yellow { background: var(--yellow-bg); color: var(--yellow); }
+    .status-badge.status-red { background: var(--red-bg); color: var(--red); }
+    .status-badge.status-gray { background: var(--border); color: var(--text-muted); }
+    
+    .status-badge::before {
+      content: '';
       display: inline-block;
-      width: 12px;
-      height: 12px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
+      background: currentColor;
     }
     
-    .status-green { background: #4ade80; }
-    .status-yellow { background: #facc15; }
-    .status-red { background: #f87171; }
-    .status-gray { background: #52525b; }
-    
+    /* LOADING / ERROR */
     .loading, .error {
       padding: 3rem;
       text-align: center;
-      background: #18181b;
-      border-radius: 0.5rem;
+      background: var(--card);
+      border-radius: 0.75rem;
       margin: 2rem 0;
+      border: 1px solid var(--border);
     }
     
-    .error { background: #450a0a; color: #fca5a5; }
+    .loading-spinner {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 1rem;
+    }
     
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .error {
+      background: rgba(248, 113, 113, 0.05);
+      color: var(--red);
+      border-color: rgba(248, 113, 113, 0.2);
+    }
+    
+    .empty-state {
+      padding: 3rem 1rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    /* FOOTER */
+    footer {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    /* ANIMACIÓN */
+    .fade-in { animation: fadeIn 0.4s ease-out; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* RESPONSIVE */
     @media (max-width: 768px) {
       body { padding: 1rem; }
       .scorecards { grid-template-columns: 1fr; }
-      th, td { padding: 0.5rem 0.75rem; font-size: 0.75rem; }
+      th, td { padding: 0.625rem 0.75rem; font-size: 0.75rem; }
+      .pct-mini-bar { width: 40px; }
+      .client-avatar { display: none; }
+      .pacing-metrics { flex-wrap: wrap; gap: 0.75rem; }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <div>
-        <h1>Paid Media Dashboard</h1>
-        <p class="subtitle" id="last-updated">Cargando datos...</p>
+      <div class="header-title">
+        <div class="header-icon">📊</div>
+        <div>
+          <h1>Paid Media Dashboard</h1>
+          <p class="subtitle" id="last-updated">Cargando datos...</p>
+        </div>
       </div>
       <div class="header-controls">
         <select id="month-selector" class="month-selector" onchange="onMonthChange()">
@@ -259,30 +692,35 @@
     </header>
     
     <div id="app">
-      <div class="loading">Cargando datos...</div>
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <div>Cargando datos...</div>
+      </div>
     </div>
+    
+    <footer id="footer" style="display:none;">
+      <div>Trafico • Paid Media Control</div>
+      <div id="footer-stats"></div>
+    </footer>
   </div>
 
   <script>
     const CONFIG = {
-   
       CSV_CLIENTES: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEH7G_E1uEjoivg5QjyW6iyN3PFFw6Q-w-HX3S7FrF7svXTkvYHX-TINb47bmiNTbdBUn7tl5icM8X/pub?gid=2070065787&single=true&output=csv',
       CSV_PRESUPUESTOS: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEH7G_E1uEjoivg5QjyW6iyN3PFFw6Q-w-HX3S7FrF7svXTkvYHX-TINb47bmiNTbdBUn7tl5icM8X/pub?gid=0&single=true&output=csv',
       CSV_HISTORICO: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEH7G_E1uEjoivg5QjyW6iyN3PFFw6Q-w-HX3S7FrF7svXTkvYHX-TINb47bmiNTbdBUn7tl5icM8X/pub?gid=249745944&single=true&output=csv',
     };
     
-    // Estado global
     let GLOBAL_DATA = null;
     let SELECTED_PERIOD = null;
+    let SEARCH_QUERY = '';
+    let STATUS_FILTER = 'all';
+    let SORT_COLUMN = 'aprobado';
+    let SORT_DESC = true;
     
-    // ============================================
     // UTILS
-    // ============================================
     function formatMoney(num) {
-      return '$' + (num || 0).toLocaleString('en-US', { 
-        minimumFractionDigits: 0, 
-        maximumFractionDigits: 0 
-      });
+      return '$' + (num || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     }
     
     function formatPct(num) {
@@ -291,17 +729,25 @@
     
     function getCurrentMonth() {
       const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth() + 1).padStart(2, '0');
-      return `${yyyy}-${mm}`;
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     }
     
     function formatMonthLabel(periodo) {
-      // "2026-05" → "Mayo 2026"
       const [year, month] = periodo.split('-').map(Number);
-      const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+      const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
       return `${meses[month - 1]} ${year}`;
+    }
+    
+    function getInitials(name) {
+      if (!name) return '?';
+      const parts = String(name).trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    
+    function parseNumber(val) {
+      if (typeof val === 'number') return val;
+      return parseFloat(String(val || '0').replace(/[$,\s]/g, '')) || 0;
     }
     
     function getDiasDelMes(periodo) {
@@ -309,54 +755,48 @@
       const ultimoDia = new Date(year, month, 0).getDate();
       const hoy = new Date();
       const esElMesActual = (hoy.getFullYear() === year && (hoy.getMonth() + 1) === month);
-      const esMesPasado = (hoy.getFullYear() > year) || 
-                          (hoy.getFullYear() === year && (hoy.getMonth() + 1) > month);
+      const esMesPasado = (hoy.getFullYear() > year) || (hoy.getFullYear() === year && (hoy.getMonth() + 1) > month);
       
       let diasTranscurridos;
-      if (esMesPasado) {
-        diasTranscurridos = ultimoDia; // mes cerrado, todos los días contaron
-      } else if (esElMesActual) {
-        diasTranscurridos = Math.max(hoy.getDate() - 1, 1); // hoy aún no cerró
-      } else {
-        diasTranscurridos = 0; // mes futuro
-      }
+      if (esMesPasado) diasTranscurridos = ultimoDia;
+      else if (esElMesActual) diasTranscurridos = Math.max(hoy.getDate() - 1, 1);
+      else diasTranscurridos = 0;
       
       return {
         total: ultimoDia,
         transcurridos: diasTranscurridos,
+        restantes: Math.max(ultimoDia - diasTranscurridos, 0),
         esElMesActual,
         esMesPasado,
       };
     }
     
-    // Detecta todos los periodos disponibles en los datos
     function getAvailablePeriods(presupuestos, historico) {
       const periods = new Set();
-      
-      presupuestos.forEach(p => {
-        if (p.mes_periodo) periods.add(p.mes_periodo);
-      });
-      
+      presupuestos.forEach(p => { if (p.mes_periodo) periods.add(p.mes_periodo); });
       historico.forEach(h => {
-        if (typeof h.fecha === 'string' && h.fecha.length >= 7) {
-          periods.add(h.fecha.substring(0, 7));
-        }
+        if (typeof h.fecha === 'string' && h.fecha.length >= 7) periods.add(h.fecha.substring(0, 7));
       });
-      
-      return Array.from(periods).sort().reverse(); // más reciente primero
+      return Array.from(periods).sort().reverse();
     }
     
-    // ============================================
+    function getPlataformas(cliente) {
+      const plats = [];
+      if (cliente.id_meta) plats.push('Meta');
+      if (cliente.id_google) plats.push('Google');
+      if (cliente.id_tiktok) plats.push('TikTok');
+      return plats;
+    }
+    
     // FETCHING
-    // ============================================
     async function fetchCsv(url) {
       const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP ${response.status} - ${url}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const text = await response.text();
       const parsed = Papa.parse(text, {
         header: true,
         skipEmptyLines: true,
-        dynamicTyping: true,
+        dynamicTyping: (header) => ['presupuesto_total', 'gasto_dia'].includes(header),
       });
       return parsed.data;
     }
@@ -370,21 +810,15 @@
       return { clientes, presupuestos, historico };
     }
     
-    // ============================================
     // CÁLCULOS
-    // ============================================
     function calcularPacingCliente(idCliente, presupuestos, historico, periodo) {
-      const filaPresup = presupuestos.find(p => 
-        p.id_cliente === idCliente && p.mes_periodo === periodo
-      );
-      const aprobado = filaPresup ? Number(filaPresup.presupuesto_total) || 0 : 0;
+      const filaPresup = presupuestos.find(p => p.id_cliente === idCliente && p.mes_periodo === periodo);
+      const aprobado = filaPresup ? parseNumber(filaPresup.presupuesto_total) : 0;
       
       const gastoFilas = historico.filter(h => 
-        h.id_cliente === idCliente && 
-        typeof h.fecha === 'string' && 
-        h.fecha.startsWith(periodo)
+        h.id_cliente === idCliente && typeof h.fecha === 'string' && h.fecha.startsWith(periodo)
       );
-      const ejecutado = gastoFilas.reduce((sum, h) => sum + (Number(h.gasto_dia) || 0), 0);
+      const ejecutado = gastoFilas.reduce((sum, h) => sum + parseNumber(h.gasto_dia), 0);
       
       const dias = getDiasDelMes(periodo);
       const gastoDiarioPromedio = dias.transcurridos > 0 ? ejecutado / dias.transcurridos : 0;
@@ -402,16 +836,11 @@
         else status = 'red';
       }
       
-      return {
-        aprobado, ejecutado, forecast,
-        pctEjecucion, pctPacingEsperado, desviacionProyectada,
-        status, dias,
-      };
+      return { aprobado, ejecutado, forecast, pctEjecucion, pctPacingEsperado, desviacionProyectada, status, dias };
     }
     
     function calcularPacingGlobal(clientes, presupuestos, historico, periodo) {
       const clientesActivos = clientes.filter(c => c.estado === 'activo');
-      
       let aprobado = 0, ejecutado = 0, forecast = 0;
       
       clientesActivos.forEach(c => {
@@ -425,32 +854,64 @@
       const desviacionProyectada = aprobado > 0 ? ((forecast - aprobado) / aprobado) * 100 : 0;
       const dias = getDiasDelMes(periodo);
       const pctPacingEsperado = (dias.transcurridos / dias.total) * 100;
+      const restante = Math.max(aprobado - ejecutado, 0);
       
       let status = 'green';
       const absDesv = Math.abs(desviacionProyectada);
-      if (absDesv > 15) status = 'red';
+      if (aprobado === 0) status = 'gray';
+      else if (absDesv > 15) status = 'red';
       else if (absDesv > 5) status = 'yellow';
       
-      return {
-        aprobado, ejecutado, forecast,
-        pctEjecucion, pctPacingEsperado, desviacionProyectada,
-        status, dias,
-      };
+      return { aprobado, ejecutado, forecast, restante, pctEjecucion, pctPacingEsperado, desviacionProyectada, status, dias };
     }
     
-    // ============================================
     // RENDER
-    // ============================================
     function renderMonthSelector(availablePeriods, selectedPeriod) {
       const selector = document.getElementById('month-selector');
       const currentMonth = getCurrentMonth();
-      
       selector.innerHTML = availablePeriods.map(p => {
         const label = formatMonthLabel(p);
         const tag = p === currentMonth ? ' (actual)' : '';
-        const selected = p === selectedPeriod ? ' selected' : '';
-        return `<option value="${p}"${selected}>${label}${tag}</option>`;
+        return `<option value="${p}"${p === selectedPeriod ? ' selected' : ''}>${label}${tag}</option>`;
       }).join('');
+    }
+    
+    function getFilteredSortedClientes() {
+      const { clientes, presupuestos, historico } = GLOBAL_DATA;
+      const periodo = SELECTED_PERIOD;
+      const clientesActivos = clientes.filter(c => c.estado === 'activo');
+      
+      let filas = clientesActivos.map(c => ({
+        cliente: c,
+        pacing: calcularPacingCliente(c.id_cliente, presupuestos, historico, periodo)
+      }));
+      
+      if (STATUS_FILTER !== 'all') {
+        filas = filas.filter(f => f.pacing.status === STATUS_FILTER);
+      }
+      
+      if (SEARCH_QUERY) {
+        const q = SEARCH_QUERY.toLowerCase();
+        filas = filas.filter(f => 
+          String(f.cliente.nombre_cliente || '').toLowerCase().includes(q) ||
+          String(f.cliente.id_cliente || '').toLowerCase().includes(q)
+        );
+      }
+      
+      filas.sort((a, b) => {
+        let va, vb;
+        if (SORT_COLUMN === 'name') {
+          va = String(a.cliente.nombre_cliente || '').toLowerCase();
+          vb = String(b.cliente.nombre_cliente || '').toLowerCase();
+          return SORT_DESC ? vb.localeCompare(va) : va.localeCompare(vb);
+        } else {
+          va = a.pacing[SORT_COLUMN] || 0;
+          vb = b.pacing[SORT_COLUMN] || 0;
+          return SORT_DESC ? vb - va : va - vb;
+        }
+      });
+      
+      return filas;
     }
     
     function renderDashboard() {
@@ -458,143 +919,271 @@
       const periodo = SELECTED_PERIOD;
       
       const global = calcularPacingGlobal(clientes, presupuestos, historico, periodo);
+      const clientesActivos = clientes.filter(c => c.estado === 'activo');
+      const todasFilas = clientesActivos.map(c => ({
+        cliente: c,
+        pacing: calcularPacingCliente(c.id_cliente, presupuestos, historico, periodo)
+      }));
+      
+      const counts = { all: todasFilas.length, green: 0, yellow: 0, red: 0, gray: 0 };
+      todasFilas.forEach(f => counts[f.pacing.status]++);
       
       const desvClass = global.status === 'green' ? 'positive' : 
-                       (global.status === 'yellow' ? 'warning' : 'danger');
+                       (global.status === 'yellow' ? 'warning' : 
+                       (global.status === 'red' ? 'danger' : 'neutral'));
       const desvSign = global.desviacionProyectada >= 0 ? '+' : '';
       
       const pacingPct = Math.min(global.pctEjecucion, 100);
       const expectedMarker = Math.min(global.pctPacingEsperado, 100);
-      const pacingBarClass = global.status === 'green' ? '' : 
-                            (global.status === 'yellow' ? 'warning' : 'danger');
+      const pacingBarClass = global.status === 'green' ? 'green' : 
+                            (global.status === 'yellow' ? 'yellow' : 
+                            (global.status === 'red' ? 'red' : 'yellow'));
       
-      const clientesActivos = clientes.filter(c => c.estado === 'activo');
+      const statusLabel = global.status === 'green' ? 'En ritmo' :
+                         (global.status === 'yellow' ? 'Atención' :
+                         (global.status === 'red' ? 'Fuera' : 'Sin datos'));
       
-      const filasClientes = clientesActivos
-        .map(c => ({
-          cliente: c,
-          pacing: calcularPacingCliente(c.id_cliente, presupuestos, historico, periodo)
-        }))
-        .sort((a, b) => b.pacing.aprobado - a.pacing.aprobado)
-        .map(({ cliente, pacing }) => {
+      const filas = getFilteredSortedClientes();
+      
+      const filasClientesHTML = filas.length === 0 
+        ? `<tr><td colspan="7" class="empty-state">No hay clientes que coincidan con los filtros</td></tr>`
+        : filas.map(({ cliente, pacing }) => {
           const dSign = pacing.desviacionProyectada >= 0 ? '+' : '';
           const dClass = pacing.status === 'green' ? 'positive' : 
-                        (pacing.status === 'yellow' ? 'warning' : 'danger');
+                        (pacing.status === 'yellow' ? 'warning' : 
+                        (pacing.status === 'red' ? 'danger' : 'neutral'));
+          
+          const nombre = cliente.nombre_cliente || cliente.id_cliente;
+          const plats = getPlataformas(cliente);
+          const platsHTML = plats.map(p => `<span class="platform-tag">${p}</span>`).join('');
+          
+          const clientStatusLabel = pacing.status === 'green' ? 'En ritmo' :
+                                    (pacing.status === 'yellow' ? 'Atención' :
+                                    (pacing.status === 'red' ? 'Fuera' : 'Sin presup.'));
+          
+          const pctBarClass = pacing.status === 'green' ? '' : 
+                             (pacing.status === 'yellow' ? 'warning' : 'danger');
+          const pctBarWidth = Math.min(pacing.pctEjecucion, 100);
           
           return `
-            <tr onclick="alert('Vista de detalle próximamente. Cliente: ${cliente.nombre_cliente}')">
-              <td class="client-name">${cliente.nombre_cliente || cliente.id_cliente}</td>
+            <tr onclick="alert('Vista de detalle próximamente. Cliente: ${nombre}')">
+              <td>
+                <div class="client-cell">
+                  <div class="client-avatar">${getInitials(nombre)}</div>
+                  <div class="client-info">
+                    <div class="client-name">${nombre}</div>
+                    <div class="client-platforms">${platsHTML}</div>
+                  </div>
+                </div>
+              </td>
               <td class="right numeric">${formatMoney(pacing.aprobado)}</td>
               <td class="right numeric">${formatMoney(pacing.ejecutado)}</td>
-              <td class="right numeric">${formatPct(pacing.pctEjecucion)}</td>
+              <td class="right">
+                <div class="pct-cell">
+                  <span class="pct-value">${formatPct(pacing.pctEjecucion)}</span>
+                  <div class="pct-mini-bar">
+                    <div class="pct-mini-bar-fill ${pctBarClass}" style="width: ${pctBarWidth}%"></div>
+                  </div>
+                </div>
+              </td>
               <td class="right numeric">${formatMoney(pacing.forecast)}</td>
-              <td class="right numeric scorecard-sub ${dClass}">${dSign}${formatPct(pacing.desviacionProyectada)}</td>
-              <td class="center"><span class="status-dot status-${pacing.status}"></span></td>
+              <td class="right">
+                <span class="desv-badge ${dClass}">${dSign}${formatPct(pacing.desviacionProyectada)}</span>
+              </td>
+              <td class="center">
+                <span class="status-badge status-${pacing.status}">${clientStatusLabel}</span>
+              </td>
             </tr>
           `;
         }).join('');
       
-      // Indicador de mes
       const monthIndicator = global.dias.esElMesActual 
-        ? '<span class="month-indicator current">En curso</span>'
-        : (global.dias.esMesPasado ? '<span class="month-indicator past">Mes cerrado</span>' : '');
-      
-      const pacingLabel = global.dias.esMesPasado 
-        ? `${global.dias.total} de ${global.dias.total} días (cerrado)`
-        : `Día ${global.dias.transcurridos} de ${global.dias.total}`;
+        ? '<span class="scorecard-badge positive">En curso</span>'
+        : (global.dias.esMesPasado ? '<span class="scorecard-badge neutral">Cerrado</span>' : '');
       
       const forecastLabel = global.dias.esMesPasado ? 'Total Final' : 'Forecast Mes';
       
+      const gap = global.forecast - global.aprobado;
+      const gapText = gap >= 0 ? `+${formatMoney(gap)}` : `-${formatMoney(Math.abs(gap))}`;
+      
+      const sortIcon = (col) => SORT_COLUMN === col ? (SORT_DESC ? '▼' : '▲') : '';
+      const sortClass = (col) => SORT_COLUMN === col ? 'sorted' : '';
+      
+      // Pacing info line
+      const pacingInfoText = global.dias.esMesPasado 
+        ? `Mes cerrado · ${formatMoney(global.ejecutado)} de ${formatMoney(global.aprobado)} ejecutado`
+        : `Día ${global.dias.transcurridos} de ${global.dias.total} · ${formatMoney(global.ejecutado)} de ${formatMoney(global.aprobado)} ejecutado`;
+      
       const app = document.getElementById('app');
       app.innerHTML = `
-        <div class="scorecards">
-          <div class="scorecard">
-            <div class="scorecard-label">Aprobado ${monthIndicator}</div>
-            <div class="scorecard-value">${formatMoney(global.aprobado)}</div>
-            <div class="scorecard-sub">${clientesActivos.length} clientes activos</div>
+        <div class="fade-in">
+          <div class="scorecards">
+            <div class="scorecard">
+              <div class="scorecard-header">
+                <div class="scorecard-label">Aprobado ${monthIndicator}</div>
+                <div class="scorecard-icon approved">💰</div>
+              </div>
+              <div class="scorecard-value">${formatMoney(global.aprobado)}</div>
+              <div class="scorecard-sub">${clientesActivos.length} clientes activos</div>
+            </div>
+            <div class="scorecard">
+              <div class="scorecard-header">
+                <div class="scorecard-label">Ejecutado</div>
+                <div class="scorecard-icon executed">📈</div>
+              </div>
+              <div class="scorecard-value">${formatMoney(global.ejecutado)}</div>
+              <div class="scorecard-sub">${formatPct(global.pctEjecucion)} del aprobado</div>
+            </div>
+            <div class="scorecard">
+              <div class="scorecard-header">
+                <div class="scorecard-label">${forecastLabel}</div>
+                <div class="scorecard-icon forecast">🎯</div>
+              </div>
+              <div class="scorecard-value">${formatMoney(global.forecast)}</div>
+              <div class="scorecard-sub">
+                <span class="scorecard-badge ${desvClass}">${desvSign}${formatPct(global.desviacionProyectada)}</span>
+                <span>${gapText} vs aprobado</span>
+              </div>
+            </div>
           </div>
-          <div class="scorecard">
-            <div class="scorecard-label">Ejecutado</div>
-            <div class="scorecard-value">${formatMoney(global.ejecutado)}</div>
-            <div class="scorecard-sub">${formatPct(global.pctEjecucion)} del aprobado</div>
+          
+          <div class="pacing-section">
+            <div class="pacing-top">
+              <div class="pacing-title">Pacing del mes</div>
+              <span class="pacing-status-badge status-${global.status}">${statusLabel}</span>
+            </div>
+            <div class="pacing-info">${pacingInfoText}</div>
+            
+            <div class="pacing-bar-wrapper">
+              <div class="pacing-bar-track">
+                <div class="pacing-bar-fill ${pacingBarClass}" style="width: ${pacingPct}%">
+                  ${pacingPct > 12 ? `<span class="pacing-bar-pct">${formatPct(global.pctEjecucion)}</span>` : ''}
+                </div>
+              </div>
+              ${!global.dias.esMesPasado ? `
+                <div class="pacing-marker" style="left: ${expectedMarker}%"></div>
+                <div class="pacing-marker-label" style="left: ${expectedMarker}%">
+                  <span class="pacing-marker-dash"></span>
+                  Esperado ${formatPct(global.pctPacingEsperado)}
+                </div>
+              ` : ''}
+            </div>
+            
+            <div class="pacing-metrics">
+              <div>
+                <div class="pacing-metric-label">Ejecutado</div>
+                <div class="pacing-metric-value">${formatMoney(global.ejecutado)}</div>
+              </div>
+              <div style="text-align: center;">
+                <div class="pacing-metric-label">Restante</div>
+                <div class="pacing-metric-value">${formatMoney(global.restante)}</div>
+              </div>
+              <div style="text-align: right;">
+                <div class="pacing-metric-label">${global.dias.esMesPasado ? 'Días totales' : 'Días restantes'}</div>
+                <div class="pacing-metric-value">${global.dias.esMesPasado ? global.dias.total : global.dias.restantes}</div>
+              </div>
+            </div>
           </div>
-          <div class="scorecard">
-            <div class="scorecard-label">${forecastLabel}</div>
-            <div class="scorecard-value">${formatMoney(global.forecast)}</div>
-            <div class="scorecard-sub ${desvClass}">${desvSign}${formatPct(global.desviacionProyectada)} vs aprobado</div>
+          
+          <div class="filters-row">
+            <input type="text" class="search-input" placeholder="Buscar cliente..." 
+                   value="${SEARCH_QUERY}" oninput="onSearchChange(this.value)">
+            <button class="filter-btn ${STATUS_FILTER === 'all' ? 'active' : ''}" onclick="onStatusFilter('all')">
+              Todos <span class="count">${counts.all}</span>
+            </button>
+            <button class="filter-btn ${STATUS_FILTER === 'green' ? 'active' : ''}" onclick="onStatusFilter('green')">
+              🟢 En ritmo <span class="count">${counts.green}</span>
+            </button>
+            <button class="filter-btn ${STATUS_FILTER === 'yellow' ? 'active' : ''}" onclick="onStatusFilter('yellow')">
+              🟡 Atención <span class="count">${counts.yellow}</span>
+            </button>
+            <button class="filter-btn ${STATUS_FILTER === 'red' ? 'active' : ''}" onclick="onStatusFilter('red')">
+              🔴 Fuera <span class="count">${counts.red}</span>
+            </button>
           </div>
-        </div>
-        
-        <div class="pacing-section">
-          <div class="pacing-info">
-            <span>${pacingLabel}</span>
-            <span>Pacing esperado: ${formatPct(global.pctPacingEsperado)}</span>
+          
+          <div class="clients-section">
+            <div class="clients-header">
+              <h2>Clientes — ${formatMonthLabel(periodo)}</h2>
+              <span class="clients-count">${filas.length} de ${clientesActivos.length} mostrados</span>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th class="${sortClass('name')}" onclick="onSortChange('name')">Cliente <span class="sort-icon">${sortIcon('name')}</span></th>
+                  <th class="right ${sortClass('aprobado')}" onclick="onSortChange('aprobado')">Aprobado <span class="sort-icon">${sortIcon('aprobado')}</span></th>
+                  <th class="right ${sortClass('ejecutado')}" onclick="onSortChange('ejecutado')">Ejecutado <span class="sort-icon">${sortIcon('ejecutado')}</span></th>
+                  <th class="right ${sortClass('pctEjecucion')}" onclick="onSortChange('pctEjecucion')">% Ejec <span class="sort-icon">${sortIcon('pctEjecucion')}</span></th>
+                  <th class="right ${sortClass('forecast')}" onclick="onSortChange('forecast')">${forecastLabel} <span class="sort-icon">${sortIcon('forecast')}</span></th>
+                  <th class="right ${sortClass('desviacionProyectada')}" onclick="onSortChange('desviacionProyectada')">Desv. <span class="sort-icon">${sortIcon('desviacionProyectada')}</span></th>
+                  <th class="center">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filasClientesHTML}
+              </tbody>
+            </table>
           </div>
-          <div class="pacing-bar-container">
-            <div class="pacing-bar-fill ${pacingBarClass}" style="width: ${pacingPct}%"></div>
-            <div class="pacing-expected-marker" style="left: ${expectedMarker}%"></div>
-          </div>
-        </div>
-        
-        <div class="clients-section">
-          <div class="clients-header">
-            <h2>Clientes — ${formatMonthLabel(periodo)}</h2>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Cliente</th>
-                <th class="right">Aprobado</th>
-                <th class="right">Ejecutado</th>
-                <th class="right">% Ejec</th>
-                <th class="right">${forecastLabel}</th>
-                <th class="right">Desv. Proy.</th>
-                <th class="center">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${filasClientes}
-            </tbody>
-          </table>
         </div>
       `;
       
+      const totalCampanas = historico.filter(h => 
+        typeof h.fecha === 'string' && h.fecha.startsWith(periodo) &&
+        h.id_nativo_campana && !['SIN_GASTO', 'ERROR_API', 'UNKNOWN'].includes(h.id_nativo_campana)
+      ).length;
+      
+      document.getElementById('footer').style.display = 'flex';
+      document.getElementById('footer-stats').innerHTML = 
+        `${totalCampanas} registros de campañas en ${formatMonthLabel(periodo)}`;
+      
       const now = new Date().toLocaleString('es-ES');
       document.getElementById('last-updated').textContent = 
-        `Última actualización: ${now} — Visualizando: ${formatMonthLabel(periodo)}`;
+        `Actualizado: ${now} · Viendo ${formatMonthLabel(periodo)}`;
     }
     
+    // EVENTOS
     function onMonthChange() {
-      const selector = document.getElementById('month-selector');
-      SELECTED_PERIOD = selector.value;
+      SELECTED_PERIOD = document.getElementById('month-selector').value;
       renderDashboard();
     }
     
-    // ============================================
+    function onSearchChange(value) {
+      SEARCH_QUERY = value;
+      renderDashboard();
+    }
+    
+    function onStatusFilter(status) {
+      STATUS_FILTER = status;
+      renderDashboard();
+    }
+    
+    function onSortChange(column) {
+      if (SORT_COLUMN === column) {
+        SORT_DESC = !SORT_DESC;
+      } else {
+        SORT_COLUMN = column;
+        SORT_DESC = true;
+      }
+      renderDashboard();
+    }
+    
     // INIT
-    // ============================================
     async function init() {
       try {
         GLOBAL_DATA = await loadAllData();
-        
-        // Detectar periodos disponibles
-        const availablePeriods = getAvailablePeriods(
-          GLOBAL_DATA.presupuestos, 
-          GLOBAL_DATA.historico
-        );
+        const availablePeriods = getAvailablePeriods(GLOBAL_DATA.presupuestos, GLOBAL_DATA.historico);
         
         if (availablePeriods.length === 0) {
           document.getElementById('app').innerHTML = `
             <div class="error">
-              <h2>Sin datos disponibles</h2>
+              <h2 style="margin-bottom: 1rem;">Sin datos disponibles</h2>
               <p>No se encontraron presupuestos ni gastos para ningún periodo.</p>
-            </div>
-          `;
+            </div>`;
           return;
         }
         
-        // Por default, seleccionar el periodo más reciente con data
-        SELECTED_PERIOD = availablePeriods[0];
+        const currentMonth = getCurrentMonth();
+        SELECTED_PERIOD = availablePeriods.includes(currentMonth) ? currentMonth : availablePeriods[0];
         
         renderMonthSelector(availablePeriods, SELECTED_PERIOD);
         renderDashboard();
@@ -603,8 +1192,7 @@
           <div class="error">
             <h2 style="margin-bottom: 1rem;">Error cargando datos</h2>
             <p>${error.message}</p>
-          </div>
-        `;
+          </div>`;
         console.error(error);
       }
     }
